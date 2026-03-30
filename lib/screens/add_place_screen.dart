@@ -16,6 +16,11 @@ class _AddPlaceScreenState extends State<AddPlaceScreen> {
   TextEditingController phone = TextEditingController();
   TextEditingController whatsapp = TextEditingController();
 
+  // 🔥 الجديد
+  TextEditingController openTime = TextEditingController();
+  TextEditingController closeTime = TextEditingController();
+  TextEditingController workingDays = TextEditingController();
+
   Uint8List? imageBytes;
   String? imageUrl;
 
@@ -63,6 +68,11 @@ class _AddPlaceScreenState extends State<AddPlaceScreen> {
         "phone": phone.text,
         "whatsapp": whatsapp.text,
         "category_id": selectedCategory,
+
+        // 🔥 الجديد
+        "open_time": openTime.text,
+        "close_time": closeTime.text,
+        "working_days": workingDays.text,
       },
     );
 
@@ -129,6 +139,11 @@ class _AddPlaceScreenState extends State<AddPlaceScreen> {
                 buildInput(address, "Address"),
                 buildInput(phone, "Phone"),
                 buildInput(whatsapp, "WhatsApp"),
+
+                // 🔥 الجديد
+                buildInput(openTime, "Open Time (09:00)"),
+                buildInput(closeTime, "Close Time (23:00)"),
+                buildInput(workingDays, "Working Days (Sat-Sun)"),
 
                 SizedBox(height: 15),
 

@@ -1,3 +1,4 @@
+import 'package:dalel_dashboard/screens/transport_section.dart';
 import 'package:dalel_dashboard/screens/users_admin_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -88,6 +89,7 @@ children: [
                 buildCard(context, "Items", Icons.fastfood, Colors.purple, ItemsSection()),
                 buildCard(context, "Ads", Icons.campaign, Colors.red, AdsSection()),
                 buildCard(context, "Notifications", Icons.notifications_active, Colors.teal, NotificationSection()),
+                buildCard(context, "Transport", Icons.directions_car, Colors.teal, TransportSection()),
 
               ],
             ),

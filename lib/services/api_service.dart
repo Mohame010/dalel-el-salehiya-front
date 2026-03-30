@@ -105,6 +105,6 @@ class ApiService {
 
     final data = _handleResponse(res);
 
-    return data?["imageUrl"];
+    return data?["url"];
   }
 }
