@@ -1,7 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:image_picker_for_web/image_picker_for_web.dart';
+import 'package:image_picker/image_picker.dart';
 import 'dart:typed_data';
 import '../services/api_service.dart'; // ✅ استخدم ApiService
 

@@ -17,7 +17,7 @@ class _TransportSectionState extends State<TransportSection> {
   TextEditingController from = TextEditingController();
   TextEditingController to = TextEditingController();
   TextEditingController price = TextEditingController();
-  TextEditingController time = TextEditingController(); // ✅ جديد
+  TextEditingController time = TextEditingController();
 
   @override
   void initState() {
@@ -36,61 +36,119 @@ class _TransportSectionState extends State<TransportSection> {
     setState(() => categories = data);
   }
 
-  // ✅ ADD
+  /// 🔥 ADD
   addRoute() async {
-    await ApiService.post("/add-route", {
-      "type": selectedType,
-      "from_location": from.text,
-      "to_location": to.text,
-      "price": price.text,
-      "category_id": selectedCategory,
-      "time": time.text, // ✅ جديد
-    });
+    try {
 
-    Navigator.pop(context);
-    getRoutes();
-    clear();
+      /// 🛑 Validation
+      if (from.text.isEmpty ||
+          to.text.isEmpty ||
+          price.text.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("املأ كل البيانات ❌")),
+        );
+        return;
+      }
+
+      /// 🔄 Loading
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (_) => Center(child: CircularProgressIndicator()),
+      );
+
+      await ApiService.post("/add-route", {
+        "type": selectedType,
+        "from_location": from.text,
+        "to_location": to.text,
+        "price": price.text,
+        "category_id": selectedCategory,
+        "time": time.text,
+      });
+
+      Navigator.pop(context); // loading
+      Navigator.pop(context); // dialog
+
+      getRoutes();
+      clear();
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("تم الإضافة بنجاح ✅")),
+      );
+
+    } catch (e) {
+      Navigator.pop(context);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("حصل خطأ ❌")),
+      );
+
+      print(e);
+    }
   }
 
-  // ✅ DELETE
+  /// 🔥 UPDATE
+  updateRoute(id) async {
+    try {
+
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (_) => Center(child: CircularProgressIndicator()),
+      );
+
+      await ApiService.put("/update-route/$id", {
+        "type": selectedType,
+        "from_location": from.text,
+        "to_location": to.text,
+        "price": price.text,
+        "category_id": selectedCategory,
+        "time": time.text,
+      });
+
+      Navigator.pop(context);
+      Navigator.pop(context);
+
+      getRoutes();
+      clear();
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("تم التعديل ✅")),
+      );
+
+    } catch (e) {
+      Navigator.pop(context);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("خطأ ❌")),
+      );
+    }
+  }
+
+  /// 🔥 DELETE
   deleteRoute(id) async {
     await ApiService.delete("/delete-route/$id");
     getRoutes();
   }
 
-  // ✅ UPDATE
-  updateRoute(id) async {
-    await ApiService.put("/update-route/$id", {
-      "type": selectedType,
-      "from_location": from.text,
-      "to_location": to.text,
-      "price": price.text,
-      "category_id": selectedCategory,
-      "time": time.text, // ✅ جديد
-    });
-
-    Navigator.pop(context);
-    getRoutes();
-    clear();
-  }
-
-  // ✅ CLEAR
+  /// 🔥 CLEAR
   clear() {
     from.clear();
     to.clear();
     price.clear();
-    time.clear(); // ✅ جديد
+    time.clear();
     selectedCategory = null;
     selectedType = "توكتوك";
   }
 
+  /// 🔥 FORM
   void showForm({Map? data}) {
 
     if (data != null) {
       from.text = data["from_location"];
       to.text = data["to_location"];
       price.text = data["price"].toString();
-      time.text = data["time"] ?? ""; // ✅ جديد
+      time.text = data["time"] ?? "";
       selectedType = data["type"];
       selectedCategory = data["category_id"];
     }
@@ -99,6 +157,7 @@ class _TransportSectionState extends State<TransportSection> {
       context: context,
       builder: (_) => AlertDialog(
         title: Text(data == null ? "Add Route 🚗" : "Edit Route ✏️"),
+
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -109,7 +168,8 @@ class _TransportSectionState extends State<TransportSection> {
                 items: ["توكتوك", "ميكروباص", "قطار"].map((e) {
                   return DropdownMenuItem(value: e, child: Text(e));
                 }).toList(),
-                onChanged: (v) => setState(() => selectedType = v.toString()),
+                onChanged: (v) =>
+                    setState(() => selectedType = v.toString()),
                 decoration: InputDecoration(labelText: "Type"),
               ),
 
@@ -124,7 +184,8 @@ class _TransportSectionState extends State<TransportSection> {
                     child: Text(c["name"]),
                   );
                 }).toList(),
-                onChanged: (v) => setState(() => selectedCategory = v as int),
+                onChanged: (v) =>
+                    setState(() => selectedCategory = v as int),
                 decoration: InputDecoration(labelText: "Category"),
               ),
 
@@ -132,24 +193,24 @@ class _TransportSectionState extends State<TransportSection> {
 
               TextField(
                 controller: from,
-                decoration: InputDecoration(labelText: "من (بداية المسار)"),
+                decoration: InputDecoration(labelText: "من"),
               ),
 
               TextField(
                 controller: to,
-                decoration: InputDecoration(labelText: "إلى (نهاية المسار)"),
+                decoration: InputDecoration(labelText: "إلى"),
               ),
 
               TextField(
                 controller: price,
+                keyboardType: TextInputType.number,
                 decoration: InputDecoration(labelText: "السعر"),
               ),
 
               TextField(
                 controller: time,
-                decoration: InputDecoration(labelText: "الموعد ⏰"), // ✅ جديد
+                decoration: InputDecoration(labelText: "الموعد ⏰"),
               ),
-
             ],
           ),
         ),
@@ -157,7 +218,9 @@ class _TransportSectionState extends State<TransportSection> {
         actions: [
           TextButton(
             onPressed: () {
-              data == null ? addRoute() : updateRoute(data["id"]);
+              data == null
+                  ? addRoute()
+                  : updateRoute(data["id"]);
             },
             child: Text("Save"),
           )
@@ -186,10 +249,10 @@ class _TransportSectionState extends State<TransportSection> {
 
           return Card(
             child: ListTile(
-              title: Text("المسار: ${r["from_location"]} → ${r["to_location"]}"),
+              title: Text(
+                  "المسار: ${r["from_location"]} → ${r["to_location"]}"),
               subtitle: Text(
-                "${r["type"]} | ${r["time"] ?? "-"} ⏰ | ${r["price"]} جنيه"
-              ),
+                  "${r["type"]} | ${r["time"] ?? "-"} ⏰ | ${r["price"]} جنيه"),
 
               trailing: Row(
                 mainAxisSize: MainAxisSize.min,
@@ -204,7 +267,6 @@ class _TransportSectionState extends State<TransportSection> {
                     icon: Icon(Icons.delete, color: Colors.red),
                     onPressed: () => deleteRoute(r["id"]),
                   ),
-
                 ],
               ),
             ),
